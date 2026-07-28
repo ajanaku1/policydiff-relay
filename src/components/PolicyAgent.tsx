@@ -1,15 +1,26 @@
 import {
-  type Dispatch,
   type FormEvent,
-  type SetStateAction,
-  useEffect,
-  useRef,
   useState,
 } from "react";
 import type { AgentConversation } from "@base44/sdk";
 
 import { base44 } from "../api/base44Client";
+import {
+  createReviewerTask,
+  explainFinding,
+} from "../api/controlRoomGateway";
+import {
+  formatFindingExplanation,
+  type FindingExplanation,
+  isGroundedAgentAnswer,
+  isGroundedTaskConfirmation,
+  isReviewerTaskRequest,
+  toPlainAgentAnswer,
+} from "../domain/policyOpsAnswer";
 import type { FindingView } from "../types/controlRoom";
+
+const agentPollIntervalMs = 1_000;
+const agentPollLimit = 20;
 
 interface AgentModel {
   finding: FindingView;
@@ -32,17 +43,8 @@ function usePolicyAgent(model: AgentModel) {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("Ask why a finding is blocked or what evidence a reviewer still needs.");
   const [isWorking, setIsWorking] = useState(false);
-  const unsubscribe = useRef<() => void>(() => undefined);
-  useEffect(() => () => unsubscribe.current(), []);
   const submit = (event: FormEvent) =>
-    submitQuestion(event, {
-      answer: setAnswer,
-      isWorking: setIsWorking,
-      model,
-      question,
-      resetQuestion: () => setQuestion(""),
-      unsubscribe,
-    });
+    submitQuestion(event, model, question, setAnswer, setIsWorking, setQuestion);
   return { answer, isWorking, question, setQuestion, submit };
 }
 
@@ -83,69 +85,105 @@ function AgentForm({
   );
 }
 
-interface SubmitContext {
-  answer: Dispatch<SetStateAction<string>>;
-  isWorking: Dispatch<SetStateAction<boolean>>;
-  model: AgentModel;
-  question: string;
-  resetQuestion: () => void;
-  unsubscribe: { current: () => void };
-}
-
 async function submitQuestion(
   event: FormEvent,
-  context: SubmitContext,
+  model: AgentModel,
+  question: string,
+  setAnswer: (answer: string) => void,
+  setIsWorking: (isWorking: boolean) => void,
+  setQuestion: (question: string) => void,
 ): Promise<void> {
   event.preventDefault();
-  if (!context.question.trim()) return;
-  context.isWorking(true);
+  const prompt = question.trim();
+  if (!prompt) return;
+  setIsWorking(true);
   try {
-    if (context.model.isDemo) {
-      context.answer(demoAnswer(context.model.finding));
+    if (model.isDemo) {
+      setAnswer(demoAnswer(model.finding));
     } else {
-      await askAgent(context.model.finding.id, context.question, context.answer, context.unsubscribe);
+      setAnswer(await askPolicyOps(model.finding.id, prompt));
     }
-    context.resetQuestion();
+    setQuestion("");
   } catch (error) {
-    context.answer(errorMessage(error));
+    setAnswer(errorMessage(error));
   } finally {
-    context.isWorking(false);
+    setIsWorking(false);
   }
 }
 
-async function askAgent(
+async function askPolicyOps(
   findingId: string,
   question: string,
-  setAnswer: (value: string) => void,
-  unsubscribe: { current: () => void },
-): Promise<void> {
+): Promise<string> {
+  const explanation = await explainFinding(findingId);
+  const answer = await askGroundedAgent(
+    findingId,
+    question,
+    explanation,
+  ).catch(() => undefined);
+  if (isReviewerTaskRequest(question)) {
+    if (answer && isGroundedTaskConfirmation(answer, explanation)) {
+      return toPlainAgentAnswer(answer);
+    }
+    await createReviewerTask(findingId, question);
+    return "Reviewer task opened with this request and the finding evidence attached.";
+  }
+  const fallback = formatFindingExplanation(explanation);
+  return answer && isGroundedAgentAnswer(answer, explanation)
+    ? toPlainAgentAnswer(answer)
+    : fallback;
+}
+
+async function askGroundedAgent(
+  findingId: string,
+  question: string,
+  explanation: FindingExplanation,
+): Promise<string | undefined> {
   const conversation = await base44.agents.createConversation({
     agent_name: "policy_ops",
     metadata: { finding_id: findingId },
   });
-  unsubscribe.current();
-  unsubscribe.current = subscribeForAnswer(conversation.id, setAnswer);
-  setAnswer("Policy Ops is tracing the cited evidence…");
   await base44.agents.addMessage(conversation, {
-    content: `${question}\n\nFinding ID: ${findingId}`,
+    content: buildAgentPrompt(findingId, question, explanation),
     role: "user",
   });
+  return pollForAssistant(conversation.id);
 }
 
-function subscribeForAnswer(
+function buildAgentPrompt(
+  findingId: string,
+  question: string,
+  explanation: FindingExplanation,
+): string {
+  return [
+    question,
+    `Finding ID: ${findingId}`,
+    "Call explainFinding with that exact ID before answering.",
+    "Begin with the classification, then include the returned rationale and evidence excerpts exactly.",
+    `Trusted boundary: ${JSON.stringify(explanation)}`,
+  ].join("\n\n");
+}
+
+async function pollForAssistant(
   conversationId: string,
-  setAnswer: (value: string) => void,
-): () => void {
-  return base44.agents.subscribeToConversation(conversationId, (conversation) => {
-    const response = latestAssistantMessage(conversation);
-    if (response) setAnswer(response);
-  });
+): Promise<string | undefined> {
+  for (let attempt = 0; attempt < agentPollLimit; attempt += 1) {
+    const conversation = await base44.agents.getConversation(conversationId);
+    const answer = conversation && latestAssistantMessage(conversation);
+    if (answer) return answer;
+    await wait(agentPollIntervalMs);
+  }
+  return undefined;
+}
+
+function wait(durationMs: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, durationMs));
 }
 
 function latestAssistantMessage(conversation: AgentConversation): string {
   const message = [...conversation.messages]
     .reverse()
-    .find((candidate) => candidate.role === "assistant");
+    .find(({ role }) => role === "assistant");
   return typeof message?.content === "string" ? message.content : "";
 }
 
