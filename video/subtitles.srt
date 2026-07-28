@@ -1,0 +1,101 @@
+1
+00:00:00,000 --> 00:00:02,750
+A single policy sentence changed.
+
+2
+00:00:02,750 --> 00:00:04,700
+Which answers are now wrong?
+
+3
+00:00:04,700 --> 00:00:07,818
+PolicyDiff Relay traces that change from the source document
+to every answer it touched.
+
+4
+00:00:07,818 --> 00:00:10,700
+The source is a locked Google Doc.
+
+5
+00:00:10,700 --> 00:00:16,900
+When the enrollment age moved from 18 to 21,
+a file-scoped Base44 Workflow exported the document.
+
+6
+00:00:16,900 --> 00:00:21,150
+It stored an immutable version, compared it with v4,
+and replayed three prior guidance records.
+
+7
+00:00:21,150 --> 00:00:23,693
+The live control room now shows the completed 3-of-3 incident.
+
+8
+00:00:23,693 --> 00:00:28,600
+One answer stays valid because it depends on
+an unchanged waiting-period clause.
+
+9
+00:00:28,600 --> 00:00:33,550
+One is uncertain because the policy never says
+whether contractors are applicants.
+
+10
+00:00:33,550 --> 00:00:36,950
+The affected answer cites section 4.2 directly.
+
+11
+00:00:36,950 --> 00:00:40,382
+Reviewers see the old text, new text, model rationale,
+and proposed correction together.
+
+12
+00:00:40,382 --> 00:00:43,350
+The model does not make the decision.
+
+13
+00:00:43,350 --> 00:00:47,550
+Dahunsi approves the correction through
+a server-checked reviewer boundary.
+
+14
+00:00:47,550 --> 00:00:52,400
+PolicyDiff locks a new delivery revision,
+sends one real Gmail message,
+
+15
+00:00:52,400 --> 00:00:55,650
+and exposes a single-use acknowledgement link.
+
+16
+00:00:55,650 --> 00:00:58,571
+The recipient confirms it once. Realtime state marks
+delivery and acknowledgement complete.
+
+17
+00:00:58,571 --> 00:01:02,300
+Policy Ops is a restricted Base44 Agent.
+
+18
+00:01:02,300 --> 00:01:07,950
+It can explain cited evidence and open reviewer work,
+but it cannot approve, send, mutate records, or delete.
+
+19
+00:01:07,950 --> 00:01:12,950
+Here it calls the trusted finding tool
+and states the contractor gap plainly.
+
+20
+00:01:12,950 --> 00:01:19,287
+The audit export opens a five-minute signed file containing
+the version chain, findings, approval, delivery, and receipt.
+
+21
+00:01:19,287 --> 00:01:24,600
+PolicyDiff Relay turns a policy edit
+into a traceable correction incident.
+
+22
+00:01:24,600 --> 00:01:30,046
+Seventeen trusted functions. Seven active workflows.
+One evidence trail from change to closure.
