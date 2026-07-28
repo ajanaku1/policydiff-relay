@@ -137,6 +137,17 @@ const approvalEntry = readFileSync(
 );
 
 describe("human approval", () => {
+  it("reads the protected finding through the service role after authentication", () => {
+    assert.match(
+      approvalEntry,
+      /buildWorkflowActor\(await base44\.auth\.me\(\)\)/,
+    );
+    assert.match(
+      approvalEntry,
+      /base44\.asServiceRole\.entities\.Finding\.get\(findingId\)/,
+    );
+  });
+
   it("creates one approval for a same-organization reviewer", async () => {
     const approvals = new MemoryApprovals();
     const approval = await approveFinding(

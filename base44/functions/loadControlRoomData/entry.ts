@@ -29,7 +29,7 @@ const coreFields = {
     "status",
   ],
   guidance: ["id", "answer", "question"],
-  policies: ["id", "name"],
+  policies: ["id", "name", "active_version_id"],
   reviewTasks: ["id", "finding_id", "status"],
   versions: ["id", "created_date", "status"],
 } satisfies {

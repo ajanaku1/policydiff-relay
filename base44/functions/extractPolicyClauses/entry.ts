@@ -46,7 +46,9 @@ async function extractCandidates(
       model: "gpt_5_mini",
       prompt:
         "Extract the policy into stable, ordered clauses. Preserve exact meaning. " +
-        "Use durable lowercase clause keys. Return only the requested structure.\n\n" +
+        "Use durable lowercase clause keys. When a heading starts with a numbered " +
+        "section such as §4.2, use the exact number (4.2) as clause_key. " +
+        "Return only the requested structure.\n\n" +
         contentText,
       response_json_schema: CLAUSE_SCHEMA,
     });

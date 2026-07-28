@@ -101,7 +101,8 @@ serveBase44Function(async (request) => {
   const actor = buildWorkflowActor(await base44.auth.me());
   const body = await readJsonObject(request);
   const findingId = readRequiredString(body, "finding_id");
-  const finding = await base44.entities.Finding.get(findingId);
+  const finding =
+    await base44.asServiceRole.entities.Finding.get(findingId);
   const result = await createReviewerTask(
     {
       actor,

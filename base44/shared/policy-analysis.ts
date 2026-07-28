@@ -141,11 +141,20 @@ function readClauseCandidate(value: unknown): ClauseCandidate {
   if (!isRecord(value)) {
     throw new PolicyAnalysisError("CLAUSE_OUTPUT_INVALID");
   }
+  const heading = readRequiredString(value.heading, "CLAUSE_OUTPUT_INVALID");
   return {
     body: readRequiredString(value.body, "CLAUSE_OUTPUT_INVALID"),
-    clauseKey: readRequiredString(value.clause_key, "CLAUSE_OUTPUT_INVALID"),
-    heading: readRequiredString(value.heading, "CLAUSE_OUTPUT_INVALID"),
+    clauseKey: stableClauseKey(
+      heading,
+      readRequiredString(value.clause_key, "CLAUSE_OUTPUT_INVALID"),
+    ),
+    heading,
   };
+}
+
+function stableClauseKey(heading: string, fallback: string): string {
+  const section = heading.match(/^\s*§?\s*(\d+(?:\.\d+)+)\b/);
+  return section?.[1] ?? fallback;
 }
 
 function compareClause(

@@ -20,10 +20,11 @@ class Base44FindingReader implements AgentFindingReader {
   constructor(private readonly base44: Base44Client) {}
 
   async load(findingId: string): Promise<AgentFindingView> {
-    const finding = await this.base44.entities.Finding.get(findingId);
+    const finding =
+      await this.base44.asServiceRole.entities.Finding.get(findingId);
     const clauses = await Promise.all(
       finding.evidence_clause_ids.map((id) =>
-        this.base44.entities.PolicyClause.get(id)
+        this.base44.asServiceRole.entities.PolicyClause.get(id)
       ),
     );
     return toAgentFindingView(finding, clauses);

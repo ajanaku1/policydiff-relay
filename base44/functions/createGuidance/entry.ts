@@ -19,7 +19,7 @@ async function loadActivePolicy(
   actor: WorkflowActor,
   policyId: string,
 ): Promise<EntityRecord["Policy"] & { active_version_id: string }> {
-  const policy = await base44.entities.Policy.get(policyId);
+  const policy = await base44.asServiceRole.entities.Policy.get(policyId);
   if (
     policy.organization_id !== actor.organizationId ||
     !policy.active_version_id
@@ -35,7 +35,7 @@ async function assertValidCitations(
   policy: EntityRecord["Policy"] & { active_version_id: string },
   citedClauseIds: string[],
 ): Promise<void> {
-  const clauses = await base44.entities.PolicyClause.filter(
+  const clauses = await base44.asServiceRole.entities.PolicyClause.filter(
     { id: { $in: citedClauseIds } },
     "ordinal",
     citedClauseIds.length,

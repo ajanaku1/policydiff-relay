@@ -71,6 +71,20 @@ describe("policy analysis contracts", () => {
     );
   });
 
+  it("uses numbered headings as stable clause keys", () => {
+    const clauses = validateClauseCandidates({
+      clauses: [
+        {
+          body: "Applicants must be at least 21 years old.",
+          clause_key: "sec_4_2_eligibility_age",
+          heading: "§4.2 Eligibility age",
+        },
+      ],
+    });
+
+    assert.equal(clauses[0]?.clauseKey, "4.2");
+  });
+
   it("finds one material delta for the changed eligibility clause", () => {
     const delta = compareClauseSets(
       "version-old",

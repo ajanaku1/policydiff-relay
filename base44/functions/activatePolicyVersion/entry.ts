@@ -35,8 +35,10 @@ async function activateVersion(
   actor: WorkflowActor,
   versionId: string,
 ): Promise<{ policy_id: string; version_id: string }> {
-  const version = await base44.entities.PolicyVersion.get(versionId);
-  const policy = await base44.entities.Policy.get(version.policy_id);
+  const version =
+    await base44.asServiceRole.entities.PolicyVersion.get(versionId);
+  const policy =
+    await base44.asServiceRole.entities.Policy.get(version.policy_id);
   assertActivatable(actor, policy, version);
   const updated = await base44.asServiceRole.entities.Policy.updateMany(
     { active_version_id: policy.active_version_id, id: policy.id },

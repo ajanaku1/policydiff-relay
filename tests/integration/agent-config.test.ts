@@ -36,6 +36,7 @@ it("gives the policy agent only explanation and reviewer-task tools", () => {
   );
   assert.match(agent.instructions, /never approve/i);
   assert.match(agent.instructions, /staff/i);
+  assert.match(agent.instructions, /always call explainFinding/i);
 });
 
 it("backs every agent tool with a deployable Base44 function", () => {
@@ -55,4 +56,30 @@ it("backs every agent tool with a deployable Base44 function", () => {
     );
     assert.ok(existsSync(entryPath), `Missing agent function: ${tool.function_name}`);
   }
+});
+
+it("authorizes agent tools before service-role evidence reads", () => {
+  const explain = readFileSync(
+    join(process.cwd(), "base44/functions/explainFinding/entry.ts"),
+    "utf8",
+  );
+  const task = readFileSync(
+    join(process.cwd(), "base44/functions/createReviewerTask/entry.ts"),
+    "utf8",
+  );
+
+  assert.match(explain, /buildWorkflowActor\(await base44\.auth\.me\(\)\)/);
+  assert.match(
+    explain,
+    /asServiceRole\.entities\.Finding\.get\(findingId\)/,
+  );
+  assert.match(
+    explain,
+    /asServiceRole\.entities\.PolicyClause\.get\(id\)/,
+  );
+  assert.match(task, /buildWorkflowActor\(await base44\.auth\.me\(\)\)/);
+  assert.match(
+    task,
+    /asServiceRole\.entities\.Finding\.get\(findingId\)/,
+  );
 });
