@@ -1,0 +1,1 @@
+PolicyDiff Relay turns a policy edit into a traceable correction incident. Seventeen trusted functions, seven active workflows, Google Drive, Gmail, and one evidence trail from change to closure.

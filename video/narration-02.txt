@@ -1,0 +1,1 @@
+The source is a locked Google Doc. When the enrollment age moved from eighteen to twenty-one, a file-scoped Base44 Workflow exported the document, stored an immutable version, compared it with version four, and replayed three prior guidance records. The live control room now shows the completed three-of-three incident.
