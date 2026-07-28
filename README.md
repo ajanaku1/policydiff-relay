@@ -16,7 +16,6 @@ acknowledges it.
 
 - [What PolicyDiff Relay does](#what-policydiff-relay-does)
 - [Live demo](#live-demo)
-- [Demo video](#demo-video)
 - [Demo journey](#demo-journey)
 - [Features](#features)
 - [Screenshots](#screenshots)
@@ -50,12 +49,6 @@ and fictional recipient data.
 [Open PolicyDiff Relay on Base44](https://policydiff-relay-8292a74a.base44.app).
 Sign in with an assigned reviewer or policy-admin account to open the control
 room.
-
-## Demo video
-
-[Watch the 90-second product demo](video/out/policydiff-relay-demo.mp4). It
-shows the deployed Drive incident, evidence review, Gmail correction,
-acknowledgement, Policy Ops explanation, and private audit export.
 
 ## Demo journey
 
