@@ -1,0 +1,27 @@
+{
+  "name": "Organization",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+  },
+  "required": ["organization_id", "name", "slug"],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor", "staff"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

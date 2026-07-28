@@ -1,0 +1,23 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "minLength": 1,
+      "rls": {
+        "read": true,
+        "write": false
+      }
+    },
+    "policy_role": {
+      "type": "string",
+      "enum": ["policy_admin", "reviewer", "auditor", "staff"],
+      "rls": {
+        "read": true,
+        "write": false
+      }
+    }
+  },
+  "required": ["organization_id", "policy_role"]
+}

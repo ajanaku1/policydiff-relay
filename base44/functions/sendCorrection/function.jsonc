@@ -1,0 +1,14 @@
+{
+  "name": "sendCorrection",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "send_approved_correction",
+      "description": "Sends a newly queued correction only after server-side approval revalidation.",
+      "type": "entity",
+      "entity_name": "Delivery",
+      "event_types": ["create"],
+      "is_active": false
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "name": "Guidance",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "policy_id": { "type": "string", "minLength": 1 },
+    "policy_version_id": { "type": "string", "minLength": 1 },
+    "audience": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "effective_on": { "type": "string", "format": "date" },
+    "question": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "answer": { "type": "string", "minLength": 1, "maxLength": 8000 },
+    "cited_clause_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "recipient_name": {
+      "type": "string",
+      "rls": {
+        "read": false,
+        "write": false
+      }
+    },
+    "recipient_email": {
+      "type": "string",
+      "format": "email",
+      "rls": {
+        "read": false,
+        "write": false
+      }
+    }
+  },
+  "required": [
+    "organization_id",
+    "policy_id",
+    "policy_version_id",
+    "audience",
+    "effective_on",
+    "question",
+    "answer",
+    "cited_clause_ids",
+    "recipient_email"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor", "staff"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

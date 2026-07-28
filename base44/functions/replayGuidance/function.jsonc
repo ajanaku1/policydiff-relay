@@ -1,0 +1,14 @@
+{
+  "name": "replayGuidance",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "classify_replay_item",
+      "description": "Creates a structured candidate finding for each deterministic replay item.",
+      "type": "entity",
+      "entity_name": "ReplayItem",
+      "event_types": ["create"],
+      "is_active": false
+    }
+  ]
+}

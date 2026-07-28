@@ -1,0 +1,15 @@
+// PolicyDiff Relay Base44 project configuration.
+{
+  "name": "policydiff-relay",
+  "description": "Policy version control and correction incident response",
+  "agentsDir": "./agents",
+  "entitiesDir": "./entities",
+  "functionsDir": "./.deploy/functions",
+  "connectorsDir": "./connectors",
+  "site": {
+    "installCommand": "npm install",
+    "buildCommand": "npm run build",
+    "serveCommand": "npm run dev",
+    "outputDirectory": "./dist"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "PolicyClause",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "policy_version_id": { "type": "string", "minLength": 1 },
+    "clause_key": { "type": "string", "minLength": 1 },
+    "heading": { "type": "string", "minLength": 1, "maxLength": 240 },
+    "body": { "type": "string", "minLength": 1 },
+    "body_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "ordinal": { "type": "integer", "minimum": 0 },
+    "dedupe_key": { "type": "string", "minLength": 1 }
+  },
+  "required": [
+    "organization_id",
+    "policy_version_id",
+    "clause_key",
+    "heading",
+    "body",
+    "body_hash",
+    "ordinal",
+    "dedupe_key"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor", "staff"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

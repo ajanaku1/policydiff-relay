@@ -1,0 +1,41 @@
+{
+  "name": "Acknowledgement",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "delivery_id": { "type": "string", "minLength": 1 },
+    "dedupe_key": { "type": "string", "minLength": 1 },
+    "acknowledged_at": { "type": "string", "format": "date-time" },
+    "request_fingerprint_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "rls": {
+        "read": false,
+        "write": false
+      }
+    }
+  },
+  "required": [
+    "organization_id",
+    "delivery_id",
+    "dedupe_key",
+    "acknowledged_at"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "extractPolicyClauses",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "extract_new_policy_version",
+      "description": "Extracts structured clauses from each newly ingested policy version.",
+      "type": "entity",
+      "entity_name": "PolicyVersion",
+      "event_types": ["create"],
+      "is_active": false
+    }
+  ]
+}

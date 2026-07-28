@@ -1,0 +1,46 @@
+{
+  "name": "PolicyDelta",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "policy_id": { "type": "string", "minLength": 1 },
+    "old_version_id": { "type": "string", "minLength": 1 },
+    "new_version_id": { "type": "string", "minLength": 1 },
+    "materiality": {
+      "type": "string",
+      "enum": ["material", "non_material", "uncertain"]
+    },
+    "changed_clause_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "summary": { "type": "string", "maxLength": 4000 },
+    "dedupe_key": { "type": "string", "minLength": 1 }
+  },
+  "required": [
+    "organization_id",
+    "policy_id",
+    "old_version_id",
+    "new_version_id",
+    "materiality",
+    "changed_clause_ids",
+    "dedupe_key"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor", "staff"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

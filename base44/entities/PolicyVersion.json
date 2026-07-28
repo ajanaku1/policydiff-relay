@@ -1,0 +1,52 @@
+{
+  "name": "PolicyVersion",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "policy_id": { "type": "string", "minLength": 1 },
+    "source_file_id": { "type": "string", "minLength": 1 },
+    "source_revision": { "type": "string" },
+    "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "content_text": {
+      "type": "string",
+      "rls": {
+        "read": false,
+        "write": false
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["ingesting", "extracted", "compared", "active", "failed"]
+    },
+    "created_by_event_id": { "type": "string", "minLength": 1 },
+    "dedupe_key": { "type": "string", "minLength": 1 },
+    "error_code": { "type": "string" }
+  },
+  "required": [
+    "organization_id",
+    "policy_id",
+    "source_file_id",
+    "content_hash",
+    "content_text",
+    "status",
+    "created_by_event_id",
+    "dedupe_key"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor", "staff"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

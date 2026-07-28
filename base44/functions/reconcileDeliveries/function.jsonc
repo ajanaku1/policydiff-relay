@@ -1,0 +1,17 @@
+{
+  "name": "reconcileDeliveries",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "reconcile_delivery_backlog",
+      "description": "Sweeps due retries and quarantines ambiguous expired send leases.",
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5,
+      "ends_type": "never",
+      "is_active": false
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "name": "Delivery",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "approval_id": { "type": "string", "minLength": 1 },
+    "correction_revision": { "type": "integer", "minimum": 1 },
+    "guidance_id": { "type": "string", "minLength": 1 },
+    "idempotency_key": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "sending",
+        "retry_wait",
+        "sent",
+        "acknowledged",
+        "acknowledgement_expired",
+        "failed"
+      ]
+    },
+    "connector_message_id": {
+      "type": "string",
+      "rls": {
+        "read": false,
+        "write": false
+      }
+    },
+    "lease_expires_at": { "type": "string", "format": "date-time" },
+    "attempt": { "type": "integer", "minimum": 0, "default": 0 },
+    "next_attempt_at": { "type": "string", "format": "date-time" },
+    "safe_error_code": { "type": "string" }
+  },
+  "required": [
+    "organization_id",
+    "approval_id",
+    "correction_revision",
+    "guidance_id",
+    "idempotency_key",
+    "status"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

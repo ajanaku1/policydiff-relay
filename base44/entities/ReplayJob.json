@@ -1,0 +1,42 @@
+{
+  "name": "ReplayJob",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "old_version_id": { "type": "string", "minLength": 1 },
+    "new_version_id": { "type": "string", "minLength": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "retry_wait", "completed", "failed"]
+    },
+    "candidate_count": { "type": "integer", "minimum": 0, "default": 0 },
+    "completed_count": { "type": "integer", "minimum": 0, "default": 0 },
+    "attempt": { "type": "integer", "minimum": 0, "default": 0 },
+    "next_attempt_at": { "type": "string", "format": "date-time" },
+    "dedupe_key": { "type": "string", "minLength": 1 }
+  },
+  "required": [
+    "organization_id",
+    "old_version_id",
+    "new_version_id",
+    "status",
+    "dedupe_key"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

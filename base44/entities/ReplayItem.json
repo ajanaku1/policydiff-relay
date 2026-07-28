@@ -1,0 +1,43 @@
+{
+  "name": "ReplayItem",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "replay_job_id": { "type": "string", "minLength": 1 },
+    "guidance_id": { "type": "string", "minLength": 1 },
+    "match_reasons": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "running", "completed", "failed"]
+    },
+    "dedupe_key": { "type": "string", "minLength": 1 }
+  },
+  "required": [
+    "organization_id",
+    "replay_job_id",
+    "guidance_id",
+    "match_reasons",
+    "status",
+    "dedupe_key"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

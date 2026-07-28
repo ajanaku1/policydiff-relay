@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.log
+
+# Secrets
+.env
+.env.local
+.env*.local
+
+# Base44 local linkage, deploy bundles, and generated types
+base44/.app.jsonc
+base44/.deploy/
+base44/.types/
+
+# Local tooling
+.codex/
+.Codex/
+.vercel/
+.DS_Store
+
+# Local project notes
+Goal.md
+prompt.md
+plan.md
+ai/

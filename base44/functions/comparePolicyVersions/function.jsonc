@@ -1,0 +1,19 @@
+{
+  "name": "comparePolicyVersions",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "compare_extracted_policy_version",
+      "description": "Compares an extracted candidate with the policy's active version.",
+      "type": "entity",
+      "entity_name": "PolicyVersion",
+      "event_types": ["update"],
+      "trigger_conditions": {
+        "conditions": [
+          { "field": "status", "operator": "equals", "value": "extracted" }
+        ]
+      },
+      "is_active": false
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "createReplayJob",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "replay_activated_policy_version",
+      "description": "Creates a deterministic replay job after a policy candidate becomes active.",
+      "type": "entity",
+      "entity_name": "PolicyVersion",
+      "event_types": ["update"],
+      "trigger_conditions": {
+        "conditions": [
+          { "field": "status", "operator": "equals", "value": "active" }
+        ]
+      },
+      "is_active": false
+    }
+  ]
+}

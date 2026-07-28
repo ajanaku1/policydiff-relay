@@ -1,0 +1,57 @@
+{
+  "name": "Finding",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "replay_item_id": { "type": "string", "minLength": 1 },
+    "dedupe_key": { "type": "string", "minLength": 1 },
+    "guidance_id": { "type": "string", "minLength": 1 },
+    "old_version_id": { "type": "string", "minLength": 1 },
+    "new_version_id": { "type": "string", "minLength": 1 },
+    "classification": {
+      "type": "string",
+      "enum": ["affected", "still_valid", "uncertain"]
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "evidence_clause_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rationale": { "type": "string", "maxLength": 4000 },
+    "correction_draft": { "type": "string", "maxLength": 8000 },
+    "status": {
+      "type": "string",
+      "enum": ["pending_review", "approved", "dismissed", "superseded"]
+    },
+    "model_name": { "type": "string" },
+    "model_output_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  },
+  "required": [
+    "organization_id",
+    "replay_item_id",
+    "dedupe_key",
+    "guidance_id",
+    "old_version_id",
+    "new_version_id",
+    "classification",
+    "evidence_clause_ids",
+    "status"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor", "staff"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}

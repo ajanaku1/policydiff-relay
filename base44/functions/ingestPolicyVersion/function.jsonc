@@ -1,0 +1,15 @@
+{
+  "name": "ingestPolicyVersion",
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "allowlisted_policy_file_update",
+      "description": "Ingests the configured policy document after its Drive connector emits file.update.",
+      "type": "connector",
+      "integration_type": "googledrive",
+      "events": ["file.update"],
+      "resource_id": "1yuUGKHKFE2QHcsU7h-0g7kkWATTRogvki-Ijau-cWxw",
+      "is_active": false
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Approval",
+  "type": "object",
+  "properties": {
+    "organization_id": { "type": "string", "minLength": 1 },
+    "finding_id": { "type": "string", "minLength": 1 },
+    "reviewer_id": { "type": "string", "minLength": 1 },
+    "decision": {
+      "type": "string",
+      "enum": ["approved", "dismissed"]
+    },
+    "correction_revision": { "type": "integer", "minimum": 1 },
+    "correction_text": { "type": "string", "maxLength": 8000 },
+    "reason": { "type": "string", "maxLength": 2000 },
+    "dedupe_key": { "type": "string", "minLength": 1 }
+  },
+  "required": [
+    "organization_id",
+    "finding_id",
+    "reviewer_id",
+    "decision",
+    "correction_revision",
+    "dedupe_key"
+  ],
+  "rls": {
+    "create": false,
+    "read": {
+      "$and": [
+        { "data.organization_id": "{{user.data.organization_id}}" },
+        {
+          "user_condition": {
+            "data.policy_role": {
+              "$in": ["policy_admin", "reviewer", "auditor"]
+            }
+          }
+        }
+      ]
+    },
+    "update": false,
+    "delete": false
+  }
+}
