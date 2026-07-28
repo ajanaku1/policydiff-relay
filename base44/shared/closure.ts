@@ -98,6 +98,17 @@ export async function createAuditPacket(
   return { packetHash, privateFileUri, signedUrl };
 }
 
+export function withinAuditCutoff<T extends { created_date?: unknown }>(
+  records: T[],
+  trailCutoffAt: string,
+): T[] {
+  const cutoff = Date.parse(trailCutoffAt);
+  return records.filter(({ created_date: createdDate }) =>
+    typeof createdDate === "string" &&
+    Date.parse(createdDate) <= cutoff
+  );
+}
+
 function assertAuditAccess(request: AuditPacketRequest): void {
   const allowed =
     request.actor.policyRole === "auditor" ||

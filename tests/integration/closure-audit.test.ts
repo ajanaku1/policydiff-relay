@@ -10,6 +10,7 @@ import {
   type AuditTrailSource,
   acknowledgeDelivery,
   createAuditPacket,
+  withinAuditCutoff,
 } from "../../base44/shared/closure.ts";
 
 class SingleUseAcknowledgements implements AcknowledgementRepository {
@@ -72,6 +73,22 @@ class RecordingPrivateFiles implements AuditFileStore {
     return "private/organization-1/audit-packet.json";
   }
 }
+
+describe("audit cutoff", () => {
+  it("keeps records at or before the requested cutoff", () => {
+    const records = [
+      { created_date: "2026-07-28T18:59:59.000Z", id: "before" },
+      { created_date: "2026-07-28T19:00:00.000Z", id: "at" },
+      { created_date: "2026-07-28T19:00:00.001Z", id: "after" },
+    ];
+
+    assert.deepEqual(
+      withinAuditCutoff(records, "2026-07-28T19:00:00.000Z")
+        .map(({ id }) => id),
+      ["before", "at"],
+    );
+  });
+});
 
 describe("single-use acknowledgement", () => {
   it("records one acknowledgement and rejects token replay", async () => {

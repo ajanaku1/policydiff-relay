@@ -8,6 +8,7 @@ import {
   type AuditTrail,
   type AuditTrailSource,
   createAuditPacket,
+  withinAuditCutoff,
 } from "../../shared/closure.ts";
 import {
   buildWorkflowActor,
@@ -23,10 +24,7 @@ class Base44AuditTrail implements AuditTrailSource {
     organizationId: string,
     trailCutoffAt: string,
   ): Promise<AuditTrail> {
-    const query = {
-      created_date: { $lte: trailCutoffAt },
-      organization_id: organizationId,
-    };
+    const query = { organization_id: organizationId };
     const [versions, findings, approvals, deliveries, acknowledgements] =
       await Promise.all([
         this.base44.asServiceRole.entities.PolicyVersion.filter(query, "created_date", 500),
@@ -40,11 +38,11 @@ class Base44AuditTrail implements AuditTrailSource {
         ),
       ]);
     return {
-      acknowledgements: acknowledgements.map(toPlainRecord),
-      approvals: approvals.map(toPlainRecord),
-      deliveries: deliveries.map(toPlainRecord),
-      findings: findings.map(toPlainRecord),
-      versions: versions.map(toPlainRecord),
+      acknowledgements: applyCutoff(acknowledgements, trailCutoffAt),
+      approvals: applyCutoff(approvals, trailCutoffAt),
+      deliveries: applyCutoff(deliveries, trailCutoffAt),
+      findings: applyCutoff(findings, trailCutoffAt),
+      versions: applyCutoff(versions, trailCutoffAt),
     };
   }
 }
@@ -76,6 +74,13 @@ class Base44AuditFiles implements AuditFileStore {
 
 function toPlainRecord(value: object): Record<string, unknown> {
   return JSON.parse(JSON.stringify(value)) as Record<string, unknown>;
+}
+
+function applyCutoff(
+  values: object[],
+  trailCutoffAt: string,
+): Record<string, unknown>[] {
+  return withinAuditCutoff(values.map(toPlainRecord), trailCutoffAt);
 }
 
 serveBase44Function(async (request) => {
