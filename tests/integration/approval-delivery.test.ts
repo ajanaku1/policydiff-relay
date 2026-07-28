@@ -177,6 +177,56 @@ describe("human approval", () => {
 });
 
 describe("server-validated delivery", () => {
+  it("rejects a staff caller before sending a correction", async () => {
+    const sender = new RecordingSender();
+
+    await assert.rejects(
+      sendValidatedCorrection(
+        "delivery-1",
+        new FixedApprovedDelivery(approvedAggregate),
+        new AtomicClaims(),
+        sender,
+        { ...reviewer, policyRole: "staff" },
+      ),
+      { code: "REVIEWER_REQUIRED" },
+    );
+    assert.equal(sender.calls, 0);
+  });
+
+  it("rejects a reviewer from another organization before sending", async () => {
+    const sender = new RecordingSender();
+
+    await assert.rejects(
+      sendValidatedCorrection(
+        "delivery-1",
+        new FixedApprovedDelivery(approvedAggregate),
+        new AtomicClaims(),
+        sender,
+        { ...reviewer, organizationId: "organization-2" },
+      ),
+      { code: "ORGANIZATION_MISMATCH" },
+    );
+    assert.equal(sender.calls, 0);
+  });
+
+  it("allows a policy admin from the delivery organization to send", async () => {
+    const sender = new RecordingSender();
+
+    const result = await sendValidatedCorrection(
+      "delivery-1",
+      new FixedApprovedDelivery(approvedAggregate),
+      new AtomicClaims(),
+      sender,
+      { ...reviewer, policyRole: "policy_admin" },
+    );
+
+    assert.deepEqual(result, {
+      kind: "sent",
+      messageId: "gmail-message-1",
+    });
+    assert.equal(sender.calls, 1);
+  });
+
   it("sends only after re-reading a matching approved aggregate", async () => {
     const sender = new RecordingSender();
     const result = await sendValidatedCorrection(
@@ -184,6 +234,7 @@ describe("server-validated delivery", () => {
       new FixedApprovedDelivery(approvedAggregate),
       new AtomicClaims(),
       sender,
+      reviewer,
     );
 
     assert.deepEqual(result, {
@@ -206,6 +257,7 @@ describe("server-validated delivery", () => {
         new FixedApprovedDelivery(stale),
         new AtomicClaims(),
         sender,
+        reviewer,
       ),
       { code: "DELIVERY_NOT_APPROVED" },
     );
@@ -225,6 +277,7 @@ describe("server-validated delivery", () => {
         new FixedApprovedDelivery(stale),
         new AtomicClaims(),
         sender,
+        reviewer,
       ),
       { code: "DELIVERY_NOT_APPROVED" },
     );
@@ -245,6 +298,7 @@ describe("server-validated delivery", () => {
       new FixedApprovedDelivery(sent),
       claims,
       sender,
+      reviewer,
     );
 
     assert.deepEqual(result, {

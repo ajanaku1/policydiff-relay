@@ -122,8 +122,18 @@ export async function sendValidatedCorrection(
   deliveries: ApprovedDeliveryRepository,
   claims: DeliveryClaimRepository,
   sender: CorrectionSender,
+  actor: WorkflowActor,
 ): Promise<SendCorrectionResult> {
+  if (
+    actor.policyRole !== "reviewer" &&
+    actor.policyRole !== "policy_admin"
+  ) {
+    throw new WorkflowError("REVIEWER_REQUIRED");
+  }
   const aggregate = await deliveries.load(deliveryId);
+  if (actor.organizationId !== aggregate.delivery.organizationId) {
+    throw new WorkflowError("ORGANIZATION_MISMATCH");
+  }
   const correction = toApprovedCorrection(deliveryId, aggregate);
   return sendCorrectionOnce(correction, claims, sender);
 }

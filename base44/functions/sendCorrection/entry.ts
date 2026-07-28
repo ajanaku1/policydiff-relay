@@ -6,6 +6,7 @@ import {
 
 import { createSafeError } from "../../shared/base44-error.ts";
 import {
+  buildWorkflowActor,
   readJsonObject,
   readRequiredString,
   readRuntimeSecret,
@@ -299,6 +300,7 @@ function assertSendableStatus(
 
 serveBase44Function(async (request) => {
   const base44 = createClientFromRequest(request);
+  const actor = buildWorkflowActor(await base44.auth.me());
   const body = await readJsonObject(request);
   const result = await sendValidatedCorrection(
     readRequiredString(body, "delivery_id"),
@@ -309,6 +311,7 @@ serveBase44Function(async (request) => {
       readRuntimeSecret("ACKNOWLEDGEMENT_SECRET"),
       readRuntimeSecret("PUBLIC_APP_URL"),
     ),
+    actor,
   );
   return Response.json(result);
 });
