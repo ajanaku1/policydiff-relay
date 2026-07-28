@@ -11,6 +11,9 @@ video/public/assets/close.png.svg
 video/public/audio/*.aiff
 video/public/subtitles/
 video/subtitle-timings.json
+video/out/*-sheet.png
+video/out/stills/
+video/out/test-hook.mp4
 
 # Secrets
 .env

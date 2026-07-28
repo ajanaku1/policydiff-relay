@@ -1,0 +1,26 @@
+{
+  "name": "policydiff-relay-video",
+  "private": true,
+  "scripts": {
+    "compositions": "remotion compositions src/Root.tsx",
+    "preview": "remotion preview src/Root.tsx",
+    "render": "remotion render src/Root.tsx Main out/policydiff-relay-demo.mp4 --concurrency=6 --jpeg-quality=60 --crf=18",
+    "render:social": "remotion render src/Root.tsx Social out/policydiff-relay-social.mp4 --concurrency=6 --jpeg-quality=60 --crf=18",
+    "render:all": "npm run render && npm run render:social",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.500",
+    "@remotion/google-fonts": "4.0.500",
+    "@remotion/media": "4.0.500",
+    "@remotion/transitions": "4.0.500",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "remotion": "4.0.500"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}
