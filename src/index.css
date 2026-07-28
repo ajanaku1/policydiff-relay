@@ -103,44 +103,9 @@ textarea:disabled {
 }
 
 .brand-mark {
-  border: 2px solid var(--cobalt);
-  border-radius: 50%;
-  display: grid;
-  height: 42px;
-  place-items: center;
-  position: relative;
-  width: 42px;
-}
-
-.brand-mark::before,
-.brand-mark::after,
-.brand-mark i {
-  background: var(--cobalt);
-  content: "";
-  display: block;
-  position: absolute;
-}
-
-.brand-mark::before {
-  height: 2px;
-  left: -8px;
-  right: -8px;
-  top: 18px;
-}
-
-.brand-mark::after {
-  bottom: -8px;
-  top: -8px;
-  left: 18px;
-  width: 2px;
-}
-
-.brand-mark i {
-  background: transparent;
-  border: 2px solid var(--cobalt);
-  border-radius: 50%;
-  height: 18px;
-  width: 18px;
+  fill: var(--cobalt);
+  height: 40px;
+  width: 40px;
 }
 
 .header-context,
@@ -991,6 +956,13 @@ main {
   max-width: 32rem;
 }
 
+.state-mark {
+  fill: var(--cobalt);
+  height: 68px;
+  margin-bottom: var(--space-6);
+  width: 68px;
+}
+
 .loading-orbit {
   border: 2px solid var(--line);
   border-radius: 50%;
@@ -1077,14 +1049,6 @@ main {
   .brand-mark {
     height: 34px;
     width: 34px;
-  }
-
-  .brand-mark::before {
-    top: 14px;
-  }
-
-  .brand-mark::after {
-    left: 14px;
   }
 
   .text-button {

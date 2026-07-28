@@ -1,4 +1,5 @@
 import type { Actor } from "../types/controlRoom";
+import { BrandMark } from "./BrandMark";
 
 interface HeaderModel {
   actor: Actor;
@@ -11,9 +12,7 @@ export function Header({ model }: { model: HeaderModel }) {
   return (
     <header className="app-header">
       <a className="brand" href="#main" aria-label="PolicyDiff Relay home">
-        <span className="brand-mark" aria-hidden="true">
-          <i />
-        </span>
+        <BrandMark className="brand-mark" />
         <span>PolicyDiff Relay</span>
       </a>
       <div className="header-context">
