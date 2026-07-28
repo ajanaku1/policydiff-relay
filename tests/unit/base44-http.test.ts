@@ -50,6 +50,13 @@ describe("Base44 function HTTP boundary", () => {
       readResourceId({ data: { id: "version-2" } }, "policy_version_id"),
       "version-2",
     );
+    assert.equal(
+      readResourceId(
+        { trigger: { data: { id: "version-3" } } },
+        "policy_version_id",
+      ),
+      "version-3",
+    );
   });
 
   it("reads non-empty arrays of non-empty strings", () => {
@@ -89,6 +96,21 @@ describe("Base44 function HTTP boundary", () => {
       }),
       {
         event: { type: "file.update" },
+        data: { file_id: "doc-1" },
+      },
+    );
+  });
+
+  it("unwraps a Base44 Workflow trigger payload", () => {
+    assert.deepEqual(
+      readAutomationPayload({
+        trigger: {
+          event_type: "file.update",
+          data: { file_id: "doc-1" },
+        },
+      }),
+      {
+        event_type: "file.update",
         data: { file_id: "doc-1" },
       },
     );

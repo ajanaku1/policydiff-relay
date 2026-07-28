@@ -12,7 +12,10 @@ import {
   serveBase44Function,
 } from "../../shared/base44-http.ts";
 import { buildGoogleDocExportRequest } from "../../shared/google-api.ts";
-import type { DriveAutomationEvent } from "../../shared/ingestion.ts";
+import {
+  type DriveAutomationEvent,
+  normalizeDriveAutomationEvent,
+} from "../../shared/ingestion.ts";
 import {
   type DocumentExporter,
   type NewPolicyVersion,
@@ -120,8 +123,8 @@ function toVersionRecord(
   };
 }
 
-function readEventFileId(body: Record<string, unknown>): string {
-  const data = body.data;
+function readEventFileId(event: DriveAutomationEvent): string {
+  const data = event.data;
   return readRequiredString(
     data && typeof data === "object" && !Array.isArray(data)
       ? data as Record<string, unknown>
@@ -149,10 +152,11 @@ serveBase44Function(async (request) => {
   const base44 = createClientFromRequest(request);
   const body = await readJsonObject(request);
   const payload = readAutomationPayload(body);
-  const policy = await findPolicy(base44, readEventFileId(payload));
+  const event = normalizeDriveAutomationEvent(payload);
+  const policy = await findPolicy(base44, readEventFileId(event));
   const result = await ingestPolicyVersion(
     {
-      event: payload as unknown as DriveAutomationEvent,
+      event,
       eventId: crypto.randomUUID(),
       policy: {
         id: policy.id,

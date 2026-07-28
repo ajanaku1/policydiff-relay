@@ -74,20 +74,22 @@ export function readResourceId(
   if (direct) {
     return direct;
   }
-  const data = body.data;
-  const automationData =
-    data && typeof data === "object" && !Array.isArray(data)
-      ? data as Record<string, unknown>
-      : {};
-  return readRequiredString(automationData, "id");
+  const dataId = readClaim(readObject(body.data), "id");
+  if (dataId) {
+    return dataId;
+  }
+  const trigger = readObject(body.trigger);
+  return readRequiredString(readObject(trigger.data), "id");
 }
 
 export function readAutomationPayload(
   body: Record<string, unknown>,
 ): Record<string, unknown> {
-  const payload = body.payload;
-  if (payload && typeof payload === "object" && !Array.isArray(payload)) {
-    return payload as Record<string, unknown>;
+  for (const key of ["payload", "trigger"]) {
+    const payload = readObject(body[key]);
+    if (Object.keys(payload).length > 0) {
+      return payload;
+    }
   }
   throw new BoundaryError("REQUEST_INVALID");
 }
@@ -157,6 +159,12 @@ function errorStatus(code: string): number {
 function readClaim(source: Record<string, unknown>, field: string): string {
   const value = source[field];
   return typeof value === "string" ? value.trim() : "";
+}
+
+function readObject(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
 }
 
 function readErrorCode(error: unknown): string | undefined {

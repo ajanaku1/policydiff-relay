@@ -5,6 +5,7 @@ import {
   assertAllowlistedDriveUpdate,
   buildPolicyVersionDedupeKey,
   canonicalizePolicyText,
+  normalizeDriveAutomationEvent,
   sha256Hex,
 } from "../../base44/shared/ingestion.ts";
 
@@ -53,6 +54,63 @@ describe("Drive ingestion contract", () => {
           "policy-doc-123",
         ),
       { code: "DRIVE_EVENT_PAYLOAD_TOO_LARGE" },
+    );
+  });
+
+  it("normalizes the Drive payload emitted by Base44 Workflows", () => {
+    const event = normalizeDriveAutomationEvent({
+      trigger_type: "connector",
+      event_type: "file.update",
+      integration_type: "googledrive",
+      data: {
+        _provider_meta: {
+          "x-goog-resource-id": "drive-channel-1",
+          "x-goog-resource-uri":
+            "https://www.googleapis.com/drive/v3/files/policy-doc-123?alt=json",
+        },
+      },
+    });
+
+    assert.deepEqual(event, {
+      automation: {
+        id: "drive-channel-1",
+        name: "base44_workflow",
+        type: "connector",
+      },
+      event: {
+        integration_type: "googledrive",
+        provider_identifier: "drive-channel-1",
+        type: "file.update",
+      },
+      data: {
+        file_id: "policy-doc-123",
+      },
+      payload_too_large: false,
+    });
+    assert.deepEqual(
+      assertAllowlistedDriveUpdate(event, "policy-doc-123"),
+      {
+        fileId: "policy-doc-123",
+        providerIdentifier: "drive-channel-1",
+      },
+    );
+  });
+
+  it("rejects a malformed Base44 Drive resource URI", () => {
+    assert.throws(
+      () =>
+        normalizeDriveAutomationEvent({
+          trigger_type: "connector",
+          event_type: "file.update",
+          integration_type: "googledrive",
+          data: {
+            _provider_meta: {
+              "x-goog-resource-id": "drive-channel-1",
+              "x-goog-resource-uri": "https://example.test/not-drive",
+            },
+          },
+        }),
+      { code: "DRIVE_FILE_ID_MISSING" },
     );
   });
 
