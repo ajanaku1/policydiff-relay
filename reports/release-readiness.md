@@ -5,8 +5,10 @@ Checked: 2026-07-28
 ## Ready locally
 
 - Vite production build
-- 78 passing tests across 21 files
+- 84 passing tests across 21 files
 - strict backend and frontend TypeScript checks
+- caller authorization on correction delivery
+- revisioned approval for edited correction text
 - Base44 entity and function type generation
 - Drive automation scoped to the supplied Google Doc and kept inactive
 - isolated Base44 function deploy packaging for Workflows-enabled apps
@@ -26,9 +28,8 @@ Checked: 2026-07-28
    are present in the session.
 3. Activate the internal Workflows and, separately, the Drive Workflow.
 4. Run the deployed journey without manual entity edits.
-5. Create or connect a Git repository before any push.
 
 The Drive and Gmail connectors are authorized, both server secrets are set, all
 17 functions and the site are deployed, and the v4 demo baseline is seeded.
-No real email, Workflow activation, repository creation, commit, or push has
-been performed.
+The local Git repository has three verified commits. No real email, Workflow
+activation, remote repository creation, or push has been performed.

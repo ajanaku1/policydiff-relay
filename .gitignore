@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 build/
+.next/
 *.log
 
 # Secrets
@@ -21,6 +22,9 @@ base44/.types/
 .Codex/
 .vercel/
 .DS_Store
+__pycache__/
+*.pyc
+.venv/
 
 # Local project notes
 Goal.md

@@ -7,7 +7,7 @@ acknowledges it.
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
 [![Base44](https://img.shields.io/badge/Base44-native-15599C)](https://base44.com/)
-[![Tests](https://img.shields.io/badge/tests-78_passing-2F6E55)](#testing)
+[![Tests](https://img.shields.io/badge/tests-84_passing-2F6E55)](#testing)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ![PolicyDiff Relay control room](docs/images/control-room.png)
@@ -15,6 +15,7 @@ acknowledges it.
 ## Contents
 
 - [What PolicyDiff Relay does](#what-policydiff-relay-does)
+- [Live demo](#live-demo)
 - [Demo journey](#demo-journey)
 - [Features](#features)
 - [Screenshots](#screenshots)
@@ -42,6 +43,12 @@ findings. A person approves any correction.
 
 The current MVP uses one Google Doc, one shared Gmail sender, one organization,
 and fictional recipient data.
+
+## Live demo
+
+[Open PolicyDiff Relay on Base44](https://policydiff-relay-8292a74a.base44.app).
+Sign in with an assigned reviewer or policy-admin account to open the control
+room.
 
 ## Demo journey
 
@@ -168,6 +175,8 @@ Organization
 | Function | Responsibility |
 |---|---|
 | `seedDemoWorkspace` | Provision one idempotent v4 baseline and three fictional cited answers |
+| `seedDemoIncident` | Build the deterministic v5 incident when connector automation is unavailable |
+| `loadControlRoomData` | Return the role-filtered control-room record set |
 | `ingestPolicyVersion` | Accept the Drive event, export the allowlisted Doc, and deduplicate content |
 | `extractPolicyClauses` | Produce schema-validated clauses and persist their evidence |
 | `comparePolicyVersions` | Build one explicit old/new version delta |
@@ -322,7 +331,15 @@ npx base44 secrets set \
 These values belong in Base44 secrets. Do not add them to a client environment
 file.
 
-### 6. Validate before deployment
+### 6. Create dashboard Workflows
+
+Create the seven dashboard Workflows, including the Drive `file.update`
+Workflow, from
+[`base44/workflows/setup-prompt.md`](base44/workflows/setup-prompt.md). Keep
+them inactive until the functions, secrets, and connector authorizations are
+ready.
+
+### 7. Validate before deployment
 
 ```bash
 npm test
@@ -341,7 +358,7 @@ npm run deploy:base44
 
 ## Testing
 
-The suite has 78 passing tests across 21 files.
+The suite has 84 passing tests across 21 files.
 
 ```bash
 npm test
@@ -379,8 +396,8 @@ matrix and the test file associated with each case.
 │   ├── entities/           # Schemas, RLS, and field-level rules
 │   ├── functions/          # Trusted workflow transitions
 │   └── shared/             # Hashing, policy, delivery, and workflow logic
+├── demo/                   # Fictional policy source and 90-second runbook
 ├── docs/images/            # Verified desktop and mobile screenshots
-├── proposals/              # Three standalone frontend directions
 ├── reports/                # Architecture, data model, gaps, and hardening notes
 ├── src/
 │   ├── api/                # Base44 client and control-room gateway
@@ -396,9 +413,8 @@ matrix and the test file associated with each case.
 
 ## Known limitations
 
-- The Drive automation remains inactive until a real Doc ID is supplied.
-- Google Drive and Gmail OAuth require a user authorization step.
-- `PUBLIC_APP_URL` cannot be finalized before Base44 hosting returns a URL.
+- The dashboard Workflows remain inactive until the deployed journey is verified.
+- Google Drive and Gmail require an authorized shared connection.
 - No real correction is sent during local verification.
 - The MVP covers one source document, one sender, and one organization.
 - The model proposes review candidates. It does not make policy decisions.

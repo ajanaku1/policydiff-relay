@@ -12,6 +12,8 @@ an incorrect policy incident or duplicate correction.
 | Wrong source file | A non-allowlisted file is rejected before export | `tests/unit/ingestion-contract.test.ts` |
 | Broad replay | Version, audience, date, and clause filters narrow candidates before model use | `tests/unit/policy-analysis.test.ts` |
 | Cross-organization review | Approval and agent tools reject organization mismatch | `tests/integration/approval-delivery.test.ts`, `tests/integration/agent-tools.test.ts` |
+| Unauthorized correction send | Staff and cross-organization callers are rejected before Gmail access | `tests/integration/approval-delivery.test.ts` |
+| Edited correction approval | Changed text increments the correction revision; identical retries reuse the current revision | `tests/integration/approval-delivery.test.ts` |
 | Agent overreach | The agent has explanation and reviewer-task tools only | `tests/integration/agent-config.test.ts` |
 | Stale approval | Delivery reloads and validates the complete approved aggregate | `tests/integration/approval-delivery.test.ts` |
 | Concurrent Gmail retry | One caller owns the sending lease and one message is sent | `tests/unit/delivery-contract.test.ts` |
@@ -32,5 +34,5 @@ The full verification command is:
 npm test && npm run typecheck && npm run build && npx base44 types generate
 ```
 
-Result: 78 tests passed. TypeScript, the Vite production build, and Base44 type
+Result: 84 tests passed. TypeScript, the Vite production build, and Base44 type
 generation completed without errors.
