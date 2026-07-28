@@ -13,20 +13,19 @@ import {
 import {
   type ApprovalRecord,
   type ApprovalRepository,
+  type ApprovalRevisionInput,
   approveFinding,
 } from "../../shared/workflow.ts";
 
 class Base44Approvals implements ApprovalRepository {
   constructor(private readonly base44: Base44Client) {}
 
-  async approveIfPending(input: {
-    correctionText: string;
-    findingId: string;
-    organizationId: string;
-    reviewerId: string;
-  }): Promise<ApprovalRecord | undefined> {
-    const dedupeKey = `${input.findingId}:1:approved`;
-    const existing = await this.find(dedupeKey);
+  async approveRevision(
+    input: ApprovalRevisionInput,
+  ): Promise<ApprovalRecord | undefined> {
+    const dedupeKey =
+      `${input.findingId}:${input.correctionRevision}:approved`;
+    const existing = await this.findByDedupeKey(dedupeKey);
     if (existing) {
       return toApprovalRecord(existing);
     }
@@ -36,24 +35,29 @@ class Base44Approvals implements ApprovalRepository {
     try {
       return toApprovalRecord(await this.create(input, dedupeKey));
     } catch (error) {
-      const winner = await this.find(dedupeKey);
+      const winner = await this.findByDedupeKey(dedupeKey);
       if (winner) {
         return toApprovalRecord(winner);
       }
-      await this.releaseFinding(input.findingId);
+      if (input.correctionRevision === 1) {
+        await this.releaseFinding(input.findingId);
+      }
       throw error;
     }
   }
 
   private async claimFinding(input: {
+    correctionRevision: number;
     findingId: string;
     organizationId: string;
   }): Promise<boolean> {
+    const expectedStatus =
+      input.correctionRevision === 1 ? "pending_review" : "approved";
     const result = await this.base44.asServiceRole.entities.Finding.updateMany(
       {
         id: input.findingId,
         organization_id: input.organizationId,
-        status: "pending_review",
+        status: expectedStatus,
       },
       { $set: { status: "approved" } },
     );
@@ -61,16 +65,11 @@ class Base44Approvals implements ApprovalRepository {
   }
 
   private create(
-    input: {
-      correctionText: string;
-      findingId: string;
-      organizationId: string;
-      reviewerId: string;
-    },
+    input: ApprovalRevisionInput,
     dedupeKey: string,
   ): Promise<EntityRecord["Approval"]> {
     return this.base44.asServiceRole.entities.Approval.create({
-      correction_revision: 1,
+      correction_revision: input.correctionRevision,
       correction_text: input.correctionText,
       decision: "approved",
       dedupe_key: dedupeKey,
@@ -87,7 +86,20 @@ class Base44Approvals implements ApprovalRepository {
     );
   }
 
-  private async find(
+  async findLatest(
+    findingId: string,
+    organizationId: string,
+  ): Promise<ApprovalRecord | undefined> {
+    const [approval] =
+      await this.base44.asServiceRole.entities.Approval.filter(
+        { finding_id: findingId, organization_id: organizationId },
+        "-correction_revision",
+        1,
+      );
+    return approval ? toApprovalRecord(approval) : undefined;
+  }
+
+  private async findByDedupeKey(
     dedupeKey: string,
   ): Promise<EntityRecord["Approval"] | undefined> {
     const [approval] =

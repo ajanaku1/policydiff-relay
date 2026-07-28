@@ -24,13 +24,22 @@ export type ApprovalRecord = {
   reviewerId: string;
 };
 
+export type ApprovalRevisionInput = {
+  correctionRevision: number;
+  correctionText: string;
+  findingId: string;
+  organizationId: string;
+  reviewerId: string;
+};
+
 export interface ApprovalRepository {
-  approveIfPending(input: {
-    correctionText: string;
-    findingId: string;
-    organizationId: string;
-    reviewerId: string;
-  }): Promise<ApprovalRecord | undefined>;
+  approveRevision(
+    input: ApprovalRevisionInput,
+  ): Promise<ApprovalRecord | undefined>;
+  findLatest(
+    findingId: string,
+    organizationId: string,
+  ): Promise<ApprovalRecord | undefined>;
 }
 
 export type ApproveFindingInput = {
@@ -99,13 +108,16 @@ export async function approveFinding(
   input: ApproveFindingInput,
   approvals: ApprovalRepository,
 ): Promise<ApprovalRecord> {
-  if (input.actor.policyRole !== "reviewer") {
-    throw new WorkflowError("REVIEWER_REQUIRED");
+  authorizeReviewer(input);
+  const latest = await approvals.findLatest(
+    input.findingId,
+    input.actor.organizationId,
+  );
+  if (latest?.correctionText === input.correctionText) {
+    return latest;
   }
-  if (input.actor.organizationId !== input.findingOrganizationId) {
-    throw new WorkflowError("ORGANIZATION_MISMATCH");
-  }
-  const approval = await approvals.approveIfPending({
+  const approval = await approvals.approveRevision({
+    correctionRevision: (latest?.correctionRevision ?? 0) + 1,
     correctionText: input.correctionText,
     findingId: input.findingId,
     organizationId: input.actor.organizationId,
@@ -115,6 +127,15 @@ export async function approveFinding(
     throw new WorkflowError("FINDING_NOT_PENDING");
   }
   return approval;
+}
+
+function authorizeReviewer(input: ApproveFindingInput): void {
+  if (input.actor.policyRole !== "reviewer") {
+    throw new WorkflowError("REVIEWER_REQUIRED");
+  }
+  if (input.actor.organizationId !== input.findingOrganizationId) {
+    throw new WorkflowError("ORGANIZATION_MISMATCH");
+  }
 }
 
 export async function sendValidatedCorrection(

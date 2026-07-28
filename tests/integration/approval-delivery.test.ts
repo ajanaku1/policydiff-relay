@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, it } from "node:test";
 
 import type {
@@ -8,6 +10,8 @@ import type {
 import {
   type ApprovalRecord,
   type ApprovalRepository,
+  type ApprovalRevisionInput,
+  type ApproveFindingInput,
   type ApprovedDeliveryAggregate,
   type ApprovedDeliveryRepository,
   approveFinding,
@@ -16,27 +20,26 @@ import {
 } from "../../base44/shared/workflow.ts";
 
 class MemoryApprovals implements ApprovalRepository {
-  approval: ApprovalRecord | undefined;
+  approvals: ApprovalRecord[] = [];
 
-  async approveIfPending(input: {
-    correctionText: string;
-    findingId: string;
-    organizationId: string;
-    reviewerId: string;
-  }): Promise<ApprovalRecord | undefined> {
-    if (this.approval) {
-      return undefined;
-    }
-    this.approval = {
-      correctionRevision: 1,
+  async approveRevision(
+    input: ApprovalRevisionInput,
+  ): Promise<ApprovalRecord | undefined> {
+    const approval = {
+      correctionRevision: input.correctionRevision,
       correctionText: input.correctionText,
       decision: "approved",
       findingId: input.findingId,
-      id: "approval-1",
+      id: `approval-${input.correctionRevision}`,
       organizationId: input.organizationId,
       reviewerId: input.reviewerId,
-    };
-    return this.approval;
+    } satisfies ApprovalRecord;
+    this.approvals.push(approval);
+    return approval;
+  }
+
+  async findLatest(): Promise<ApprovalRecord | undefined> {
+    return this.approvals.at(-1);
   }
 }
 
@@ -91,6 +94,15 @@ const reviewer = {
   policyRole: "reviewer" as const,
 };
 
+function approvalInput(correctionText: string): ApproveFindingInput {
+  return {
+    actor: reviewer,
+    correctionText,
+    findingId: "finding-1",
+    findingOrganizationId: "organization-1",
+  };
+}
+
 const approvedAggregate: ApprovedDeliveryAggregate = {
   approval: {
     correctionRevision: 1,
@@ -119,6 +131,11 @@ const approvedAggregate: ApprovedDeliveryAggregate = {
   },
 };
 
+const approvalEntry = readFileSync(
+  join(process.cwd(), "base44/functions/approveFinding/entry.ts"),
+  "utf8",
+);
+
 describe("human approval", () => {
   it("creates one approval for a same-organization reviewer", async () => {
     const approvals = new MemoryApprovals();
@@ -133,18 +150,7 @@ describe("human approval", () => {
     );
 
     assert.equal(approval.decision, "approved");
-    await assert.rejects(
-      approveFinding(
-        {
-          actor: reviewer,
-          correctionText: "Duplicate approval.",
-          findingId: "finding-1",
-          findingOrganizationId: "organization-1",
-        },
-        approvals,
-      ),
-      { code: "FINDING_NOT_PENDING" },
-    );
+    assert.equal(approval.correctionRevision, 1);
   });
 
   it("rejects staff and cross-organization approval attempts", async () => {
@@ -172,6 +178,46 @@ describe("human approval", () => {
         approvals,
       ),
       { code: "ORGANIZATION_MISMATCH" },
+    );
+  });
+
+  it("creates a new correction revision when approved text changes", async () => {
+    const approvals = new MemoryApprovals();
+    const first = await approveFinding(
+      approvalInput("The minimum eligibility age is now 21."),
+      approvals,
+    );
+
+    const revised = await approveFinding(
+      approvalInput("Applicants must be 21 before their start date."),
+      approvals,
+    );
+
+    assert.equal(first.correctionRevision, 1);
+    assert.equal(revised.correctionRevision, 2);
+    assert.equal(
+      revised.correctionText,
+      "Applicants must be 21 before their start date.",
+    );
+    assert.notEqual(revised.id, first.id);
+  });
+
+  it("returns the current revision when approved text is retried", async () => {
+    const approvals = new MemoryApprovals();
+    const input = approvalInput("The minimum eligibility age is now 21.");
+
+    const first = await approveFinding(input, approvals);
+    const retry = await approveFinding(input, approvals);
+
+    assert.equal(retry.id, first.id);
+    assert.equal(retry.correctionRevision, 1);
+    assert.equal(approvals.approvals.length, 1);
+  });
+
+  it("releases the finding only when the first approval fails", () => {
+    assert.match(
+      approvalEntry,
+      /if \(input\.correctionRevision === 1\) \{\s+await this\.releaseFinding/,
     );
   });
 });
