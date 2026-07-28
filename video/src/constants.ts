@@ -103,3 +103,5 @@ export const CUES = {
     [185, SOCIAL_DURATION],
   ],
 } as const;
+
+export { SUBTITLE_SENTENCES, TEXT } from "./content";
