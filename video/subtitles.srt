@@ -54,7 +54,7 @@ The model does not make the decision.
 
 13
 00:00:43,350 --> 00:00:47,550
-Dahunsi approves the correction through
+The reviewer approves the correction through
 a server-checked reviewer boundary.
 
 14

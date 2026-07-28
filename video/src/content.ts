@@ -31,7 +31,7 @@ export const TEXT = {
   closure: {
     title: "The correction stays human-owned.",
     steps: [
-      ["01", "REVIEW", "Dahunsi approves"],
+      ["01", "REVIEW", "Reviewer approves"],
       ["02", "DELIVER", "Gmail sends once"],
       ["03", "ACKNOWLEDGE", "Single-use link"],
       ["04", "CLOSE", "Ledger completes"],
@@ -93,7 +93,7 @@ export const SUBTITLE_SENTENCES: Record<SceneId, readonly string[]> = {
     "Open it and the old clause, new clause, rationale, and correction appear in one evidence chain.",
   ],
   closure: [
-    "The model proposes; Dahunsi decides.",
+    "The model proposes; the reviewer decides.",
     "Approval locks a delivery revision.",
     "Gmail sends the correction once.",
     "The recipient opens a single-use acknowledgement link, and the ledger closes in real time.",

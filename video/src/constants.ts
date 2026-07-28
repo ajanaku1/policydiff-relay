@@ -53,7 +53,7 @@ export const PROJECT = {
 export const AUDIO_DURATIONS = {
   agentAudit: Math.round(14.86 * FPS),
   close: Math.round(7.78 * FPS),
-  closure: Math.round(14.34 * FPS),
+  closure: Math.round(15.3 * FPS),
   evidence: Math.round(14.9 * FPS),
   hook: Math.round(10.22 * FPS),
   incident: Math.round(13.94 * FPS),

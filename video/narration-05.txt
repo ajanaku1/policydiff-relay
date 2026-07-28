@@ -1,1 +1,1 @@
-The model proposes; Dahunsi decides. Approval locks a delivery revision. Gmail sends the correction once. The recipient opens a single-use acknowledgement link, and the ledger closes in real time. Retry it, and the token is rejected.
+The model proposes; the reviewer decides. Approval locks a delivery revision. Gmail sends the correction once. The recipient opens a single-use acknowledgement link, and the ledger closes in real time. Retry it, and the token is rejected.
