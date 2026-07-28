@@ -6,6 +6,11 @@ dist/
 build/
 .next/
 *.log
+video/public/assets/close.png
+video/public/assets/close.png.svg
+video/public/audio/*.aiff
+video/public/subtitles/
+video/subtitle-timings.json
 
 # Secrets
 .env
