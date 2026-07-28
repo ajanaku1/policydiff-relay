@@ -1,13 +1,24 @@
 import { BlastRadiusMap } from "./components/BlastRadiusMap";
+import { AcknowledgementPage } from "./components/AcknowledgementPage";
+import { BrandMark } from "./components/BrandMark";
 import { EvidenceReview } from "./components/EvidenceReview";
 import { FindingRail } from "./components/FindingRail";
 import { Header } from "./components/Header";
 import { PolicyAgent } from "./components/PolicyAgent";
 import { PolicyTimeline } from "./components/PolicyTimeline";
 import { RemediationLedger } from "./components/RemediationLedger";
+import { readAcknowledgementToken } from "./domain/acknowledgementRoute";
 import { useControlRoom } from "./hooks/useControlRoom";
 
 export default function App() {
+  const token = readAcknowledgementToken(window.location.href);
+  if (token) {
+    return <AcknowledgementPage token={token} />;
+  }
+  return <AuthenticatedControlRoom />;
+}
+
+function AuthenticatedControlRoom() {
   return <ControlRoom room={useControlRoom()} />;
 }
 
@@ -110,6 +121,7 @@ function Hero({ summary }: { summary: string }) {
 function LoadingState() {
   return (
     <main className="centered-state" aria-busy="true">
+      <BrandMark className="state-mark" />
       <span className="loading-orbit" aria-hidden="true" />
       <p>Mapping policy dependencies…</p>
     </main>
@@ -123,6 +135,7 @@ function ErrorState({ room }: { room: Room }) {
     : () => void room.actions.refresh();
   return (
     <main className="centered-state">
+      <BrandMark className="state-mark" />
       <p className="eyebrow">
         {room.signInRequired ? "Secure control room" : "Control room unavailable"}
       </p>

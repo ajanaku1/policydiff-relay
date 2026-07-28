@@ -1,12 +1,19 @@
 import type { EntityRecord } from "@base44/sdk";
 
 import { base44 } from "./base44Client";
+import {
+  selectIncidentDelta,
+  summarizeReplay,
+} from "./controlRoomSelection";
 import { loadDemoSnapshot } from "../data/demoSnapshot";
+import type { FindingExplanation } from "../domain/policyOpsAnswer";
 import type {
   Actor,
   AuditPacketResult,
   ClauseEvidence,
+  Classification,
   ControlRoomSnapshot,
+  FindingStatus,
   FindingView,
   LedgerEntry,
   PolicyRole,
@@ -27,6 +34,18 @@ interface LoadedRecords {
 }
 
 const roles: PolicyRole[] = ["policy_admin", "reviewer", "auditor", "staff"];
+const classifications: Classification[] = [
+  "affected",
+  "still_valid",
+  "uncertain",
+];
+const findingStatuses: FindingStatus[] = [
+  "approved",
+  "dismissed",
+  "pending_review",
+  "superseded",
+];
+const acknowledgementRequests = new Map<string, Promise<void>>();
 
 export class AuthenticationRequiredError extends Error {
   constructor() {
@@ -57,6 +76,17 @@ async function ensureAuthenticated(): Promise<void> {
 
 export function beginSignIn(): void {
   base44.auth.loginWithProvider("google", `${window.location.origin}/`);
+}
+
+export function acknowledgeReceipt(token: string): Promise<void> {
+  const existing = acknowledgementRequests.get(token);
+  if (existing) {
+    return existing;
+  }
+  const request = base44.functions.invoke("acknowledgeDelivery", { token })
+    .then(() => undefined);
+  acknowledgementRequests.set(token, request);
+  return request;
 }
 
 export function isAuthenticationRequired(error: unknown): boolean {
@@ -108,7 +138,11 @@ function buildSnapshot(
   records: LoadedRecords,
 ): ControlRoomSnapshot {
   const policy = requireFirst(records.policies, "No policy is available");
-  const delta = requireFirst(records.deltas, "No policy comparison is available");
+  const delta = selectIncidentDelta(
+    records.deltas,
+    records.findings,
+    policy.active_version_id,
+  );
   const versions = buildVersions(records.versions, delta);
   const findings = buildFindings(records, delta);
   return {
@@ -118,7 +152,7 @@ function buildSnapshot(
     ledger: buildLedger(records, findings),
     policyId: policy.id,
     policyName: policy.name,
-    replay: buildReplay(records.replayJobs, delta),
+    replay: buildReplay(records.replayJobs, delta, findings.length),
     source: "base44",
     sourceLabel: "Source locked · Google Drive",
     versions,
@@ -253,14 +287,10 @@ function previousClauseBody(
 function buildReplay(
   jobs: EntityRecord["ReplayJob"][],
   delta: EntityRecord["PolicyDelta"],
+  findingCount: number,
 ): ControlRoomSnapshot["replay"] {
   const job = jobs.find((item) => item.new_version_id === delta.new_version_id);
-  return {
-    candidateCount: job?.candidate_count ?? 0,
-    completedCount: job?.completed_count ?? 0,
-    id: job?.id ?? "replay-pending",
-    status: job?.status ?? "pending",
-  };
+  return summarizeReplay(job, findingCount);
 }
 
 function buildLedger(
@@ -364,6 +394,15 @@ export async function createReviewerTask(
   });
 }
 
+export async function explainFinding(
+  findingId: string,
+): Promise<FindingExplanation> {
+  const response = await base44.functions.invoke("explainFinding", {
+    finding_id: findingId,
+  });
+  return readFindingExplanation(response);
+}
+
 export async function sendCorrection(deliveryId: string): Promise<void> {
   await base44.functions.invoke("sendCorrection", { delivery_id: deliveryId });
 }
@@ -384,6 +423,55 @@ function readAuditResult(value: unknown): AuditPacketResult {
     throw new Error("Audit export is missing its signed URL");
   }
   return { packetHash: record.packet_hash, signedUrl: record.signed_url };
+}
+
+function readFindingExplanation(value: unknown): FindingExplanation {
+  const record = readFunctionData(value);
+  if (!isClassification(record.classification)) {
+    throw new Error("Policy Ops returned an invalid classification");
+  }
+  if (
+    !isExplanationEvidenceList(record.evidence) ||
+    typeof record.findingId !== "string" ||
+    typeof record.organizationId !== "string" ||
+    typeof record.rationale !== "string" ||
+    !isFindingStatus(record.status)
+  ) {
+    throw new Error("Policy Ops returned invalid finding evidence");
+  }
+  return {
+    classification: record.classification,
+    evidence: record.evidence,
+    findingId: record.findingId,
+    organizationId: record.organizationId,
+    rationale: record.rationale,
+    status: record.status,
+  };
+}
+
+function isClassification(value: unknown): value is Classification {
+  return typeof value === "string" &&
+    classifications.includes(value as Classification);
+}
+
+function isFindingStatus(value: unknown): value is FindingStatus {
+  return typeof value === "string" &&
+    findingStatuses.includes(value as FindingStatus);
+}
+
+function isExplanationEvidenceList(
+  value: unknown,
+): value is FindingExplanation["evidence"] {
+  return Array.isArray(value) && value.every(isExplanationEvidence);
+}
+
+function isExplanationEvidence(
+  value: unknown,
+): value is FindingExplanation["evidence"][number] {
+  if (!value || typeof value !== "object") return false;
+  const record = value as Record<string, unknown>;
+  return typeof record.clauseId === "string" &&
+    typeof record.excerpt === "string";
 }
 
 function readFunctionData(value: unknown): Record<string, unknown> {
