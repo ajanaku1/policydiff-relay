@@ -32,8 +32,8 @@ Checked: 2026-07-28
   and acknowledgement records
 - the public Base44 site serves the current release
 
-## External checkpoint still required
+## Verified publication
 
-Creating and pushing the public GitHub repository remains subject to the
-explicit checkpoint in `plan.md`. The live Base44 deployment does not depend on
-that push.
+- the public GitHub repository serves the cleaned `main` branch
+- GitHub Actions passes tests, strict type checks, and the production build
+- rendered MP4 exports remain local and are excluded from Git history
