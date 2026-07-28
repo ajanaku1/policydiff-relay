@@ -27,7 +27,7 @@ atomically with their backend function.
 The function code bundles, but automation processing returns HTTP 409:
 
 ```text
-This app uses Workflows — legacy automations are disabled for it.
+This app uses Workflows. Legacy automations are disabled for it.
 reason: workflows_enabled
 ```
 
