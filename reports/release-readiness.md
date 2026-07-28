@@ -5,7 +5,7 @@ Checked: 2026-07-28
 ## Ready locally
 
 - Vite production build
-- 101 passing tests across 25 files
+- 102 passing tests across 26 files
 - strict backend and frontend TypeScript checks
 - caller authorization on correction delivery
 - revisioned approval for edited correction text

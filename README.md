@@ -7,7 +7,7 @@ acknowledges it.
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
 [![Base44](https://img.shields.io/badge/Base44-native-15599C)](https://base44.com/)
-[![Tests](https://img.shields.io/badge/tests-101_passing-2F6E55)](#testing)
+[![Tests](https://img.shields.io/badge/tests-102_passing-2F6E55)](#testing)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ![PolicyDiff Relay control room](docs/images/control-room.png)
@@ -358,7 +358,7 @@ npm run deploy:base44
 
 ## Testing
 
-The suite has 101 passing tests across 25 files.
+The suite has 102 passing tests across 26 files.
 
 ```bash
 npm test

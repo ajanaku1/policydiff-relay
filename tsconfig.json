@@ -15,6 +15,6 @@
   "include": [
     "base44/**/*.ts",
     "tests/**/*.ts",
-    "base44/.types/*.d.ts"
+    "base44/types/*.d.ts"
   ]
 }
