@@ -1,1 +1,1 @@
-PolicyDiff Relay turns a policy edit into a traceable correction incident. Seventeen trusted functions, seven active workflows, Google Drive, Gmail, and one evidence trail from change to closure.
+Policy Ops can explain evidence or open reviewer work, but it cannot approve or send. Its answer is checked against the trusted finding before display. Then one private audit export proves the whole trail: versions, finding, approval, delivery, and receipt.

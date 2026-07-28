@@ -8,5 +8,8 @@
   delivery/acknowledgement ledger.
 - `public/assets/policy-ops.png`: deployed grounded Base44 Agent response.
 - `public/assets/audit-packet.png`: live five-minute signed audit packet.
+- `../public/logo.png`: shipped PolicyDiff Relay logo.
+- `public/audio/01-hook.mp3` through `08-social.mp3`: measured Emmanuel
+  narration generated for the main film and vertical hook.
 
 No local fallback or fabricated state is used.

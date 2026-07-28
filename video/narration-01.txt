@@ -1,1 +1,1 @@
-A single policy sentence changed. Which answers are now wrong? PolicyDiff Relay traces that change from the source document to every answer it touched.
+One sentence changed. A support answer that was safe yesterday is wrong today. The dangerous part? It is already sitting in someone's inbox. PolicyDiff Relay finds it.

@@ -1,44 +1,47 @@
-# PolicyDiff Relay: 90-second demo narration
+# PolicyDiff Relay: demo narration
 
 ## 01: Hook
 
-A single policy sentence changed. Which answers are now wrong? PolicyDiff Relay
-traces that change from the source document to every answer it touched.
+One sentence changed. A support answer that was safe yesterday is wrong today.
+The dangerous part? It is already sitting in someone's inbox. PolicyDiff Relay
+finds it.
 
-## 02: Live incident
+## 02: Policy failure
 
-The source is a locked Google Doc. When the enrollment age moved from eighteen
-to twenty-one, a file-scoped Base44 Workflow exported the document, stored an
-immutable version, compared it with version four, and replayed three prior
-guidance records. The live control room now shows the completed three-of-three
-incident.
+Normal document diffs stop at the page. They cannot tell you which past
+decisions depended on the line that moved.
 
-## 03: Evidence and review
+## 03: Live incident
 
-One answer stays valid because it depends on an unchanged waiting-period
-clause. One is uncertain because the policy never says whether contractors are
-applicants. The affected answer cites section four point two directly.
-Reviewers see the old text, the new text, the model rationale, and the proposed
-correction together.
+This is the live incident. Google Drive reports the policy edit. Base44 stores
+version five, compares it with version four, then replays exactly three cited
+answers. No bulk guessing. Three dependencies, three classifications.
 
-## 04: Delivery and acknowledgement
+## 04: Evidence review
 
-The model does not make the decision. Dahunsi approves the correction through a
-server-checked reviewer boundary. PolicyDiff locks a new delivery revision,
-sends one real Gmail message, and exposes a single-use acknowledgement link.
-The recipient confirms it once. Realtime state then marks delivery and
-acknowledgement complete, without a second send.
+The blast radius separates signal from noise. Green stays valid. Amber needs a
+human classification. Red cites the changed age rule directly. Open it and the
+old clause, new clause, rationale, and correction appear in one evidence chain.
 
-## 05: Agent and audit
+## 05: Human closure
 
-Policy Ops is a restricted Base44 Agent. It can explain cited evidence and open
-reviewer work, but it cannot approve, send, mutate arbitrary records, or delete
-anything. Here it calls the trusted finding tool and states the contractor gap
-plainly. The audit export then opens a five-minute signed file containing the
-version chain, findings, approval, delivery, and receipt.
+The model proposes; Dahunsi decides. Approval locks a delivery revision. Gmail
+sends the correction once. The recipient opens a single-use acknowledgement
+link, and the ledger closes in real time. Retry it, and the token is rejected.
 
-## 06: Close
+## 06: Agent and audit
 
-PolicyDiff Relay turns a policy edit into a traceable correction incident.
-Seventeen trusted functions, seven active workflows, Google Drive, Gmail, and
-one evidence trail from change to closure.
+Policy Ops can explain evidence or open reviewer work, but it cannot approve or
+send. Its answer is checked against the trusted finding before display. Then
+one private audit export proves the whole trail: versions, finding, approval,
+delivery, and receipt.
+
+## 07: Close
+
+One edit. Three answers. One verified correction. PolicyDiff Relay traces
+policy change all the way to human closure.
+
+## 08: Vertical social hook
+
+One sentence changed. Three past answers depended on it. One is now wrong.
+PolicyDiff Relay traces the change to closure.
