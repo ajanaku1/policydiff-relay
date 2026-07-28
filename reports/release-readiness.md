@@ -5,31 +5,35 @@ Checked: 2026-07-28
 ## Ready locally
 
 - Vite production build
-- 84 passing tests across 21 files
+- 101 passing tests across 25 files
 - strict backend and frontend TypeScript checks
 - caller authorization on correction delivery
 - revisioned approval for edited correction text
 - Base44 entity and function type generation
-- Drive automation scoped to the supplied Google Doc and kept inactive
+- Drive automation scoped to the supplied Google Doc
 - isolated Base44 function deploy packaging for Workflows-enabled apps
 - desktop and mobile screenshots
 - desktop and mobile interaction checks
 - MIT license
 - CI workflow
 - judge-facing README
-- 90-second demo runbook
+- rendered 90-second demo and 10-second social cut
 - Drive and Gmail failure notes
 
-## External checkpoints still required
+## Verified live
 
-1. Create the seven disabled dashboard Workflows from
-   `base44/workflows/setup-prompt.md`.
-2. Re-authenticate the reviewer so the new organization and policy-role claims
-   are present in the session.
-3. Activate the internal Workflows and, separately, the Drive Workflow.
-4. Run the deployed journey without manual entity edits.
+- all seven dashboard Workflows are active
+- the allowlisted Google Doc produced the v4 to v5 incident
+- replay completed for all three cited answers
+- the affected correction was approved and sent once through Gmail
+- the signed recipient link recorded one acknowledgement
+- Policy Ops returned an evidence-bound explanation for the uncertain finding
+- the private audit packet contained versions, findings, approval, delivery,
+  and acknowledgement records
+- the public Base44 site serves the current release
 
-The Drive and Gmail connectors are authorized, both server secrets are set, all
-17 functions and the site are deployed, and the v4 demo baseline is seeded.
-The local Git repository has three verified commits. No real email, Workflow
-activation, remote repository creation, or push has been performed.
+## External checkpoint still required
+
+Creating and pushing the public GitHub repository remains subject to the
+explicit checkpoint in `plan.md`. The live Base44 deployment does not depend on
+that push.

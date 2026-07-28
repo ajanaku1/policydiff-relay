@@ -7,7 +7,7 @@ acknowledges it.
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
 [![Base44](https://img.shields.io/badge/Base44-native-15599C)](https://base44.com/)
-[![Tests](https://img.shields.io/badge/tests-84_passing-2F6E55)](#testing)
+[![Tests](https://img.shields.io/badge/tests-101_passing-2F6E55)](#testing)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ![PolicyDiff Relay control room](docs/images/control-room.png)
@@ -16,6 +16,7 @@ acknowledges it.
 
 - [What PolicyDiff Relay does](#what-policydiff-relay-does)
 - [Live demo](#live-demo)
+- [Demo video](#demo-video)
 - [Demo journey](#demo-journey)
 - [Features](#features)
 - [Screenshots](#screenshots)
@@ -49,6 +50,12 @@ and fictional recipient data.
 [Open PolicyDiff Relay on Base44](https://policydiff-relay-8292a74a.base44.app).
 Sign in with an assigned reviewer or policy-admin account to open the control
 room.
+
+## Demo video
+
+[Watch the 90-second product demo](video/out/policydiff-relay-demo.mp4). It
+shows the deployed Drive incident, evidence review, Gmail correction,
+acknowledgement, Policy Ops explanation, and private audit export.
 
 ## Demo journey
 
@@ -358,7 +365,7 @@ npm run deploy:base44
 
 ## Testing
 
-The suite has 84 passing tests across 21 files.
+The suite has 101 passing tests across 25 files.
 
 ```bash
 npm test
@@ -406,16 +413,18 @@ matrix and the test file associated with each case.
 │   ├── domain/             # Pure frontend workflow decisions
 │   ├── hooks/              # Data loading, actions, and realtime subscriptions
 │   └── types/              # Control-room view types
-└── tests/
+├── tests/
     ├── integration/        # Authorization and hosted-boundary tests
     └── unit/               # Policy, delivery, ingestion, and UI logic tests
+└── video/                  # Demo script, live captures, renderer, and exports
 ```
 
 ## Known limitations
 
-- The dashboard Workflows remain inactive until the deployed journey is verified.
-- Google Drive and Gmail require an authorized shared connection.
-- No real correction is sent during local verification.
+- Google Drive and Gmail require an authorized shared connection in each
+  deployed workspace.
+- The Drive Workflow must stay bound to the exact allowlisted Google Doc.
+- Audit download links expire after five minutes.
 - The MVP covers one source document, one sender, and one organization.
 - The model proposes review candidates. It does not make policy decisions.
 - The current evidence alias is a guidance label, not recipient identity.
